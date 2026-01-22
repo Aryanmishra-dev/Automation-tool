@@ -1,0 +1,27 @@
+[
+  {
+    "url": "https://techcrunch.com/feed/",
+    "title": "TechCrunch",
+    "category": "Technology"
+  },
+  {
+    "url": "https://www.theverge.com/rss/index.xml",
+    "title": "The Verge",
+    "category": "Technology"
+  },
+  {
+    "url": "https://feeds.arstechnica.com/arstechnica/index",
+    "title": "Ars Technica",
+    "category": "Technology"
+  },
+  {
+    "url": "https://www.wired.com/feed/rss",
+    "title": "Wired",
+    "category": "Technology"
+  },
+  {
+    "url": "https://news.ycombinator.com/rss",
+    "title": "Hacker News",
+    "category": "Technology"
+  }
+]

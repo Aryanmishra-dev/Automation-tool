@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model RssFeed {
+  id          String   @id @default(cuid())
+  url         String   @unique
+  title       String
+  description String?
+  category    String?
+  isActive    Boolean  @default(true)
+  lastFetched DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+}
+
+model Post {
+  id             String     @id @default(cuid())
+  title          String     @default("")
+  content        String
+  sourceUrl      String?
+  mediaUrl       String?
+  hashtags       String     @default("[]") // JSON array stored as string for SQLite
+  platform       String     // TWITTER, LINKEDIN, INSTAGRAM
+  status         String     @default("DRAFT") // DRAFT, SCHEDULED, PUBLISHED, FAILED
+  platformPostId String?    // ID of the post on the social platform
+  scheduledFor   DateTime?
+  publishedAt    DateTime?
+  feedId         String?
+  feed           RssFeed?   @relation(fields: [feedId], references: [id])
+  analytics      Analytics?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([platform])
+}
+
+model Analytics {
+  id          String   @id @default(cuid())
+  postId      String   @unique
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  platform    String   // TWITTER, LINKEDIN, INSTAGRAM
+  likes       Int      @default(0)
+  shares      Int      @default(0)
+  comments    Int      @default(0)
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  engagement  Float    @default(0)
+  fetchedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([platform])
+  @@index([fetchedAt])
+}
+
+model Trend {
+  id          String    @id @default(cuid())
+  keyword     String    @unique
+  score       Float     @default(0)
+  count       Int       @default(1)
+  category    String?
+  sentiment   Float?
+  source      String?   // 'rss', 'twitter', 'manual'
+  platform    String?   // TWITTER, LINKEDIN, INSTAGRAM
+  lastSeen    DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([score])
+  @@index([lastSeen])
+  @@index([source])
+}
+
+model Settings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  category    String   @default("general")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+}
+
+// Platform and PostStatus are now stored as strings in SQLite
+// Valid Platform values: TWITTER, LINKEDIN, INSTAGRAM
+// Valid PostStatus values: DRAFT, SCHEDULED, PUBLISHED, FAILED

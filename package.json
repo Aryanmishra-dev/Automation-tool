@@ -1,0 +1,35 @@
+{
+  "name": "social-media-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered social media content creation and publishing bot",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "setup": "pnpm install && pnpm run db:push && pnpm run db:generate",
+    "db:push": "pnpm --filter backend prisma db push",
+    "db:migrate": "pnpm --filter backend prisma migrate dev",
+    "db:generate": "pnpm --filter backend prisma generate",
+    "db:studio": "pnpm --filter backend prisma studio",
+    "db:seed": "pnpm --filter backend prisma db seed",
+    "pm2:start": "pnpm --filter backend pm2 start ecosystem.config.js",
+    "pm2:stop": "pnpm --filter backend pm2 stop all",
+    "pm2:logs": "pnpm --filter backend pm2 logs"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.0",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
