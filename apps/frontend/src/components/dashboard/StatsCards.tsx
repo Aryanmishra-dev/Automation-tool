@@ -8,8 +8,8 @@ export default function StatsCards() {
 
   const isLoading = analyticsLoading || postsLoading;
 
-  const publishedCount = posts?.filter((p) => p.status === 'published').length ?? 0;
-  const scheduledCount = posts?.filter((p) => p.status === 'scheduled').length ?? 0;
+  const publishedCount = posts?.filter((p) => p.status === 'PUBLISHED').length ?? 0;
+  const scheduledCount = posts?.filter((p) => p.status === 'SCHEDULED').length ?? 0;
   const engagementRate = analytics?.engagementRate ?? 0;
 
   const stats = [

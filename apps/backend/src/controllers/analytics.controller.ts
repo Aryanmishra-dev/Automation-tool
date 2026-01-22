@@ -3,7 +3,7 @@ import prisma from '../config/database';
 
 export async function getOverview(req: Request, res: Response, next: NextFunction) {
   try {
-    const [totalPosts, publishedPosts, scheduledPosts, totalEngagement] = await Promise.all([
+    const [totalPosts, publishedPosts, scheduledPosts, totalEngagement, platformCounts] = await Promise.all([
       prisma.post.count(),
       prisma.post.count({ where: { status: 'PUBLISHED' } }),
       prisma.post.count({ where: { status: 'SCHEDULED' } }),
@@ -15,13 +15,36 @@ export async function getOverview(req: Request, res: Response, next: NextFunctio
           views: true,
         },
       }),
+      prisma.post.groupBy({
+        by: ['platform'],
+        _count: { id: true },
+      }),
     ]);
+
+    const totalLikes = totalEngagement._sum?.likes || 0;
+    const totalShares = totalEngagement._sum?.shares || 0;
+    const totalComments = totalEngagement._sum?.comments || 0;
+    const totalViews = totalEngagement._sum?.views || 0;
+    const totalInteractions = totalLikes + totalShares + totalComments;
+    const engagementRate = totalViews > 0 ? (totalInteractions / totalViews) * 100 : 0;
+
+    // Calculate platform stats
+    const platformStats = platformCounts.map((p) => ({
+      platform: p.platform,
+      posts: p._count.id,
+      engagement: engagementRate, // Simplified - same engagement for now
+    }));
 
     res.json({
       totalPosts,
       publishedPosts,
       scheduledPosts,
-      totalEngagement,
+      totalLikes,
+      totalShares,
+      totalComments,
+      totalViews,
+      engagementRate,
+      platformStats,
     });
   } catch (error) {
     next(error);

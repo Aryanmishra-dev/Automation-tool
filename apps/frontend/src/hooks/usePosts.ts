@@ -20,7 +20,10 @@ export function usePosts(params: PostsParams = {}) {
     queryKey: postKeys.list(params),
     queryFn: async () => {
       const response = await api.get('/posts', { params });
-      return response.data as Post[];
+      return response.data.map((post: any) => ({
+        ...post,
+        hashtags: typeof post.hashtags === 'string' ? JSON.parse(post.hashtags) : post.hashtags,
+      })) as Post[];
     },
   });
 }
@@ -30,7 +33,11 @@ export function useCreatePost() {
 
   return useMutation({
     mutationFn: async (data: Partial<Post>) => {
-      const response = await api.post('/posts', data);
+      const payload = {
+        ...data,
+        hashtags: Array.isArray(data.hashtags) ? JSON.stringify(data.hashtags) : data.hashtags,
+      };
+      const response = await api.post('/posts', payload);
       return response.data as Post;
     },
     onSuccess: () => {
@@ -44,7 +51,11 @@ export function useUpdatePost() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Post> }) => {
-      const response = await api.put(`/posts/${id}`, data);
+      const payload = {
+        ...data,
+        hashtags: Array.isArray(data.hashtags) ? JSON.stringify(data.hashtags) : data.hashtags,
+      };
+      const response = await api.put(`/posts/${id}`, payload);
       return response.data as Post;
     },
     onSuccess: () => {

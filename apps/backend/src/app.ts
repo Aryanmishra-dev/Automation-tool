@@ -63,6 +63,18 @@ app.get('/ready', (req, res) => {
   res.json({ ready: true });
 });
 
+// LinkedIn OAuth callback
+app.get("/linkedin/callback", (req, res) => {
+  const code = req.query.code;
+  const error = req.query.error;
+
+  if (error) {
+    return res.send("LinkedIn error: " + error);
+  }
+
+  res.send("LinkedIn connected ✅ Code: " + code);
+});
+
 // API Routes
 app.use('/api', routes);
 
