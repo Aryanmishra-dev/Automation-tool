@@ -1,223 +1,136 @@
-# Social Media Bot - AI-Powered Automated Content Creation & Publishing
+# Automation Tool — Social Media Automation Platform
 
-An intelligent social media automation platform that aggregates RSS feeds, analyzes trends, generates content using AI (Google Gemini + LangChain), and publishes to multiple social media platforms simultaneously.
+## Overview
 
-## 🎯 Project Goals
+A monorepo-based social media automation platform with scheduling, content management, and analytics capabilities. Built with Node.js backend and React frontend, featuring WebSocket real-time updates and Redis-backed job queues.
 
-- **90%+ Posts Automated** - Minimal manual intervention
-- **3-6 Posts Per Day** - Consistent publishing schedule
-- **<10% Manual Edits** - High-quality AI-generated content
-- **95%+ Availability** - Reliable background processing
-- **<500ms Page Load** - Fast, responsive dashboard
+## Problem Statement
 
-## 🚀 Features
+Automate repetitive social media management tasks:
+- Post scheduling across platforms
+- Content queue management
+- Engagement analytics
+- Real-time status updates via WebSockets
 
-- **RSS Aggregation**: Automatically fetch and analyze content from multiple RSS feeds (every 30 minutes)
-- **Trend Analysis**: Identify trending topics using NLP (Compromise + Natural) (every hour)
-- **AI Content Generation**: Generate engaging posts using Google Gemini API + LangChain.js (every 2 hours)
-- **Multi-Platform Publishing**: Publish to Twitter, LinkedIn, and Instagram simultaneously
-- **Duplicate Detection**: String-similarity based content deduplication
-- **Smart Scheduling**: Queue and schedule posts for optimal engagement times
-- **Real-time Dashboard**: Monitor performance and analytics with React + TanStack Query
-- **WebSocket Updates**: Live updates for post status and analytics
-- **Process Management**: PM2 for production deployment
+## Architecture
 
-## 🏗️ Architecture
-
-### Tech Stack
-- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS + shadcn/ui + TanStack Query + Zustand
-- **Backend**: Node.js 20 LTS + Express + TypeScript + Zod validation
-- **Database**: SQLite + Prisma ORM (serverless, no setup required)
-- **Queue**: Bull + Redis (background job processing)
-- **AI/NLP**: Google Gemini API + LangChain.js + Compromise + Natural + string-similarity
-- **Social APIs**: twitter-api-v2 + instagram-private-api + LinkedIn REST API
-- **Real-time**: Socket.io
-- **Testing**: Vitest
-- **Process Manager**: PM2
-- **Monorepo**: PNPM Workspaces
-
-### System Flow
 ```
-RSS Feeds → Article Extractor → NLP Processing → AI Content Generation → Platform Publishers
-                                      ↓
-                              Trend Analysis → Content Suggestions
+Automation-tool/
+├── server/
+│   ├── src/
+│   │   ├── controllers/    # Route handlers
+│   │   ├── middleware/      # Auth, rate limiting, validation
+│   │   ├── models/          # MongoDB/Mongoose schemas
+│   │   ├── services/        # Business logic
+│   │   ├── queues/          # Redis-backed job processing
+│   │   ├── websocket/       # Real-time event system
+│   │   └── config/          # Environment configuration
+│   ├── tests/
+│   └── package.json
+├── client/
+│   ├── src/
+│   │   ├── components/      # React UI components
+│   │   ├── pages/           # Route pages
+│   │   ├── hooks/           # Custom React hooks
+│   │   ├── services/        # API client
+│   │   └── store/           # State management
+│   └── package.json
+├── ecosystem.config.js      # PM2 process management
+├── docker-compose.yml
+└── package.json             # Monorepo root
 ```
 
-## 📋 Prerequisites
+## Tech Stack
 
-- **Node.js** >= 20.0.0 (LTS recommended)
-- **PNPM** >= 8.0.0
-- **Redis** >= 6 (for job queue)
-- **Mac Mini M4** (16GB RAM, 10-core CPU/GPU) - optimized for this hardware
+| Layer | Technology |
+|-------|-----------|
+| Backend | Node.js, Express |
+| Frontend | React |
+| Database | MongoDB |
+| Queue | Redis + Bull |
+| Real-time | WebSockets (Socket.io) |
+| Process Management | PM2 |
+| Auth | JWT |
 
-## 🛠️ Installation
+## Setup Instructions
 
-### 1. Clone and install dependencies:
 ```bash
-cd Automation
-pnpm install
-```
+git clone https://github.com/Aryanmishra-dev/Automation-tool.git
+cd Automation-tool
 
-### 2. Set up environment variables:
-```bash
+# Install dependencies
+npm install          # Root dependencies
+cd server && npm install
+cd ../client && npm install
+cd ..
+
+# Configure environment
 cp .env.example .env
+# Edit .env with your configuration
+
+# Start development
+npm run dev          # Starts both server and client
+
+# Or start individually
+npm run dev:server
+npm run dev:client
 ```
 
-Edit `.env` with your credentials:
-```env
-# Required
-GEMINI_API_KEY=your_gemini_api_key   # From Google AI Studio
-DATABASE_URL=file:./dev.db           # SQLite (auto-created)
+## Environment Variables
 
-# Social Platforms (add as needed)
-TWITTER_API_KEY=your_twitter_key
-TWITTER_API_SECRET=your_twitter_secret
-TWITTER_ACCESS_TOKEN=your_access_token
-TWITTER_ACCESS_SECRET=your_access_secret
-
-LINKEDIN_CLIENT_ID=your_linkedin_id
-LINKEDIN_CLIENT_SECRET=your_linkedin_secret
-
-INSTAGRAM_USERNAME=your_instagram_username
-INSTAGRAM_PASSWORD=your_instagram_password
-```
-
-### 3. Initialize database:
-```bash
-cd apps/backend
-pnpm db:push        # Create tables
-pnpm db:seed        # Add sample RSS feeds (optional)
-```
-
-### 4. Start Redis:
-```bash
-# macOS with Homebrew
-brew install redis
-brew services start redis
-```
-
-### 5. Start development:
-```bash
-# From root directory
-pnpm dev
-```
-
-## 📦 Project Structure
+See `.env.example` for all required configuration:
 
 ```
-Automation/
-├── apps/
-│   ├── backend/                 # Express API server
-│   │   ├── prisma/              # Database schema & migrations
-│   │   ├── src/
-│   │   │   ├── config/          # Configuration
-│   │   │   ├── controllers/     # Route handlers
-│   │   │   ├── jobs/            # Bull queue workers
-│   │   │   ├── middleware/      # Express middleware
-│   │   │   ├── platforms/       # Social media publishers
-│   │   │   ├── routes/          # API routes
-│   │   │   ├── services/        # Business logic
-│   │   │   └── websocket/       # Real-time updates
-│   │   └── ecosystem.config.js  # PM2 configuration
-│   └── frontend/                # React dashboard
-│       ├── src/
-│       │   ├── components/      # React components
-│       │   ├── hooks/           # TanStack Query hooks
-│       │   ├── lib/             # Utilities
-│       │   ├── pages/           # Page components
-│       │   └── services/        # API client
-│       └── vite.config.ts
-├── packages/
-│   └── shared/                  # Shared types and utilities
-├── data/
-│   ├── feeds/                   # RSS feed configurations
-│   └── logs/                    # Application logs
-└── scripts/                     # Setup and deployment scripts
+MONGODB_URI=mongodb://localhost:27017/automation
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=<generate-a-strong-secret>
+PORT=5000
+CLIENT_URL=http://localhost:3000
 ```
 
-## 🔧 Development Commands
+## API Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/register` | User registration | No |
+| POST | `/api/auth/login` | User login | No |
+| GET | `/api/posts` | List scheduled posts | Yes |
+| POST | `/api/posts` | Create scheduled post | Yes |
+| PUT | `/api/posts/:id` | Update post | Yes |
+| DELETE | `/api/posts/:id` | Delete post | Yes |
+| GET | `/api/analytics` | Get engagement metrics | Yes |
+| WS | `/ws` | Real-time status updates | Yes |
+
+## Testing
 
 ```bash
-# Start all apps in development mode
-pnpm dev
-
-# Build all apps for production
-pnpm build
-
-# Run tests
-pnpm test
-
-# Run tests with coverage
-pnpm test:coverage
-
-# Lint code
-pnpm lint
-
-# Format code
-pnpm format
-
-# Open Prisma Studio (database GUI)
-pnpm db:studio
+cd server
+npm test
+npm run test:coverage
 ```
 
-## 🚀 Production Deployment
+## Limitations
 
-### Using PM2 (Recommended)
-```bash
-# Build the applications
-pnpm build
+1. **Single platform focus** — currently only supports one social media platform.
+2. **No OAuth integration** — uses direct API credentials instead of proper OAuth flow.
+3. **Limited error recovery** — failed jobs need manual retry.
+4. **No rate limiting on API** — vulnerable to abuse.
+5. **Basic analytics** — no time-series data or trend analysis.
 
-# Start with PM2
-cd apps/backend
-pm2 start ecosystem.config.js
+## Future Improvements
 
-# Monitor processes
-pm2 monit
+- [ ] Add OAuth2 flow for platform authentication
+- [ ] Implement proper rate limiting (express-rate-limit)
+- [ ] Add retry logic with exponential backoff for failed jobs
+- [ ] Multi-platform support (Twitter, LinkedIn, Instagram)
+- [ ] Add comprehensive E2E tests
+- [ ] Implement proper logging (Winston/Pino)
+- [ ] Add Kubernetes deployment manifests
+- [ ] Set up monitoring (Prometheus + Grafana)
 
-# View logs
-pm2 logs
-```
+## Lessons Learned
 
-### Manual Start
-```bash
-# Backend
-cd apps/backend && pnpm start
-
-# Frontend (separate terminal)
-cd apps/frontend && pnpm preview
-```
-
-## 🌐 API Endpoints
-
-### Backend API (http://localhost:3000)
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/feeds` | GET, POST | Manage RSS feeds |
-| `/api/posts` | GET, POST, PUT, DELETE | Post management |
-| `/api/posts/:id/publish` | POST | Publish a post |
-| `/api/trends` | GET | Trending topics |
-| `/api/analytics` | GET | Analytics overview |
-| `/api/content/generate` | POST | Generate content from URL |
-| `/api/queue/stats` | GET | Queue statistics |
-| `/api/queue/trigger/*` | POST | Trigger jobs manually |
-| `/health` | GET | Health check with queue stats |
-
-### Frontend Dashboard (http://localhost:5173)
-- **Dashboard** - Overview with stats, recent posts, trends
-- **Posts** - Manage and filter all posts
-- **Queue** - View scheduled posts
-- **Trends** - Explore trending topics
-- **Analytics** - Performance metrics
-- **Settings** - Configure API keys and automation
-- Dashboard with real-time updates
-- Post queue management
-- Analytics and insights
-
-## 📝 License
-
-MIT
-
-## 🤝 Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
+- **What went wrong:** The initial codebase was pushed in a single commit, which obscured the development process. The JWT secret had a hardcoded fallback, and some credentials were in config files rather than environment variables.
+- **What I would improve:** Develop with feature branches from the start. Use a secrets manager or at minimum `.env` files from day one. Add input validation middleware before building any endpoint.
+- **What I misunderstood at the time:** I didn't realize how critical proper secret management is — even a fallback default for a JWT secret is a security vulnerability. I also underestimated the importance of incremental commits for demonstrating development process.
+- **How I would rebuild it today:** TypeScript throughout, proper OAuth2 flows, Bull queue with dead-letter handling, structured logging with correlation IDs, Docker Compose for local dev, Kubernetes for production, comprehensive integration tests, and feature-flag-based rollout.
